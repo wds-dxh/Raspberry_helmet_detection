@@ -1,0 +1,45 @@
+
+{  
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",  
+    "tasks": [
+        {
+            "label": "PyQt6 UI to Python",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "PyQt6.uic.pyuic",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}.py"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run PyQt6 Designer",
+            "type": "shell",
+            "command": "designer.exe",
+            "windows": {
+                "command": "designer.exe"
+            },
+            "linux": {
+                "command": "designer"
+            },
+            "mac": {
+                "command": "/path/to/designer"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "other",
+                "isDefault": false
+            }
+        }
+    ]  
+    
+}

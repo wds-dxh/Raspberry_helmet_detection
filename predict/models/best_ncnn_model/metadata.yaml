@@ -1,0 +1,19 @@
+description: Ultralytics best model trained on mydata.yaml
+author: Ultralytics
+date: '2024-07-07T17:08:09.207822'
+version: 8.2.50
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: person
+  1: vest
+  2: blue helmet
+  3: red helmet
+  4: white helmet
+  5: yellow helmet
