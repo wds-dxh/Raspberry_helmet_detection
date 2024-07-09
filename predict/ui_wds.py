@@ -1,60 +1,57 @@
-#ui_wds.py
 import sys
-from PyQt6 import QtWidgets,QtCore,uic
-from PyQt6.QtWidgets import QApplication,QMainWindow
+from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt
 import cv2
 from tools.ncnn_predict import yolov8_wds
-from tools.Judge_whether_wear   import Judge_whether_wear
+from tools.Judge_whether_wear import Judge_whether_wear
+from layout import Ui_Form
 
-
-class ui_wds():
+class ui_wds(QtWidgets.QWidget):
     def __init__(self):
-        self.app = QApplication(sys.argv)
-        self.ui: QtWidgets.QWidget = uic.loadUi("layout.ui")  # 加载ui文件
-        #设置应用名称
-        self.app.setApplicationName("头盔检测系统")   
-        self.ui.setWindowTitle("头盔检测系统")
-        self.ui.resize(600, 600)
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)  # 使用 Ui_Form 类设置 UI
 
-        #指明label的格式
-        self.label_vedio: QtWidgets.QLabel = self.ui.findChild(QtWidgets.QLabel, "label")
-        self.label_image1: QtWidgets.QLabel = self.ui.findChild(QtWidgets.QLabel, "label_2")
-        self.label_image2: QtWidgets.QLabel = self.ui.findChild(QtWidgets.QLabel, "label_3")
-        self.button_start: QtWidgets.QPushButton = self.ui.findChild(QtWidgets.QPushButton, "pushButton")
-        self.gridLayoutWidget: QtWidgets.QWidget = self.ui.findChild(QtWidgets.QWidget, "gridLayoutWidget")
+        # 设置应用名称
+        self.setWindowTitle("头盔检测系统")
+        self.resize(600, 600)
+
+        # 指明label的格式
+        self.label_vedio: QtWidgets.QLabel = self.ui.label
+        self.label_image1: QtWidgets.QLabel = self.ui.label_2
+        self.label_image2: QtWidgets.QLabel = self.ui.label_3
+        self.button_start: QtWidgets.QPushButton = self.ui.pushButton
+        self.gridLayoutWidget: QtWidgets.QWidget = self.ui.gridLayoutWidget
         self.yolo = yolov8_wds(model_path=r'.\models\best.pt')
         self.judge = Judge_whether_wear()
-        self.is_open_camera = False # 默认摄像头是关闭的
+        self.is_open_camera = False  # 默认摄像头是关闭的
         self.video_cap = None
-        self.camera_timer = QtCore.QTimer(self.ui)  # 创建读取摄像头图像的定时器
-        self.camera_timer.timeout.connect(self.play_camera_video)   # 定时器超时信号连接到槽函数play_camera_video
-        self.which_camera = 0 #判断该哪一个label显示图片
+        self.camera_timer = QtCore.QTimer(self)  # 创建读取摄像头图像的定时器
+        self.camera_timer.timeout.connect(self.play_camera_video)  # 定时器超时信号连接到槽函数play_camera_video
+        self.which_camera = 0  # 判断该哪一个label显示图片
 
-        #给label加上黑色边框
+        # 给label加上黑色边框
         self.label_vedio.setStyleSheet("border: 1px solid black")
-        self.label_vedio.setMinimumSize(320, 240) 
+        self.label_vedio.setMinimumSize(320, 240)
         self.label_vedio.setAlignment(Qt.AlignmentFlag.AlignCenter)  # 让标签要显示的内容居中
         self.label_image1.setStyleSheet("border: 1px solid black")
         self.label_image2.setStyleSheet("border: 1px solid black")
-        
+
         self.button_start.setText("打开摄像头")
         if self.gridLayoutWidget is None:
             print("Error: gridLayoutWidget is None. Check your UI file.")
         else:
             # 使用布局管理器来管理窗口布局
-            layout = QtWidgets.QVBoxLayout(self.ui)
+            layout = QtWidgets.QVBoxLayout(self)
             layout.addWidget(self.gridLayoutWidget)
-            self.ui.setLayout(layout)
+            self.setLayout(layout)
 
-
-        #绑定按钮事件，控制摄像头
+        # 绑定按钮事件，控制摄像头
         self.button_start.clicked.connect(self.start_camera)
 
-
     def start_camera(self):
-        if not self.is_open_camera: # 按下 打开摄像头 按钮
+        if not self.is_open_camera:  # 按下 打开摄像头 按钮
             self.video_cap = cv2.VideoCapture(r".\tools\test.mp4")  # 打开默认摄像头（索引为0）
             print('camera fps:', self.video_cap.get(cv2.CAP_PROP_FPS))
             self.camera_timer.start(20)  # 20毫秒刷新一次
@@ -69,7 +66,7 @@ class ui_wds():
             self.button_start.setText('打开摄像头')
             self.is_open_camera = False
             print('关闭摄像头')
-    
+
     def play_camera_video(self):
         if self.is_open_camera:
             _, frame = self.video_cap.read()  # 读取视频流的每一帧
@@ -93,4 +90,3 @@ class ui_wds():
                 else:
                     self.which_camera = 0
                     self.label_image2.setPixmap(pixmap)
-                
